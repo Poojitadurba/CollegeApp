@@ -1,4 +1,6 @@
+using CollegeApp.Data;
 using CollegeApp.MyLogging;
+using Microsoft.EntityFrameworkCore;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -23,6 +25,10 @@ builder.Services.AddOpenApi();
 builder.Services.AddControllers().AddNewtonsoftJson(); //HttpPatch
 builder.Services.AddControllers(options=>options.ReturnHttpNotAcceptable=true).AddNewtonsoftJson().AddXmlDataContractSerializerFormatters(); //Content negotiation
 builder.Services.AddScoped<IMyLogger, LogToFile>();
+builder.Services.AddDbContext<CollegeDbContext>(options =>
+{
+    options.UseSqlServer(builder.Configuration.GetConnectionString("CollegeAppDBConnection"));
+});
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
