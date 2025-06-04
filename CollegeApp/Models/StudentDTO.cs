@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+﻿using CollegeApp.Validators;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using System.ComponentModel.DataAnnotations;
 
 namespace CollegeApp.Models
@@ -13,7 +14,7 @@ namespace CollegeApp.Models
         public string StudentName { get; set; }
 
         [EmailAddress(ErrorMessage="Please enter valid email address")]
-        [Range(10,30)]
+       // [Range(0,30)]
         public string Email { get; set; }
 
         [Required]
@@ -24,5 +25,7 @@ namespace CollegeApp.Models
         [Compare(nameof(Password))]
         public string ConfirmPassword { get; set; }
 
+        [DateCheck]
+        public DateTime AdmissionDate { get; set; }
     }
 }
