@@ -1,3 +1,4 @@
+using CollegeApp.Configurations;
 using CollegeApp.Data;
 using CollegeApp.MyLogging;
 using Microsoft.EntityFrameworkCore;
@@ -29,6 +30,7 @@ builder.Services.AddDbContext<CollegeDbContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("CollegeAppDBConnection"));
 });
+builder.Services.AddAutoMapper(typeof(AutoMapperConfig));
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

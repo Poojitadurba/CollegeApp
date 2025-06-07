@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.JsonPatch;
 using CollegeApp.Data;
 using Microsoft.EntityFrameworkCore;
+using System.Threading.Tasks;
+using AutoMapper;
 
 namespace CollegeApp.Controllers
 {
@@ -12,28 +14,30 @@ namespace CollegeApp.Controllers
     {
         private readonly ILogger<StudentController> _logger;
         private readonly CollegeDbContext _dbContext;
-        public StudentController(ILogger<StudentController> logger,CollegeDbContext dbContext)
+        private readonly IMapper _mapper;
+        public StudentController(ILogger<StudentController> logger,CollegeDbContext dbContext,IMapper mapper)
         {
             _logger = logger;
             _dbContext = dbContext;
+            _mapper = mapper;
         }
 
         [HttpGet]
         [Route("all")]
-        public ActionResult<IEnumerable<StudentDTO>> GetAllStudents()
+        public async Task<ActionResult<IEnumerable<StudentDTO>>> GetAllStudents()
         {
             _logger.LogInformation("GetStudents started");
-            var students = new List<StudentDTO>();
-            foreach(var item in _dbContext.students)
-            {
-                StudentDTO student = new StudentDTO();
-                student.Id = item.Id;
-                student.StudentName = item.StudentName;
-                student.Address = item.Address;
-                student.Email = item.Email;
-                students.Add(student);
-            }
-            return Ok(students);
+            var students = await _dbContext.students.ToListAsync();
+            var studentDTOData = _mapper.Map<List<StudentDTO>>(students);
+            //var students = await _dbContext.students.Select(s => new StudentDTO()
+            //{
+            //    Id = s.Id,
+            //    StudentName = s.StudentName,
+            //    Address = s.Address,
+            //    Email = s.Email,
+            //}).ToListAsync();
+
+            return Ok(studentDTOData);
         }
 
         [HttpGet("{id:int}",Name ="GetStudentById")]
@@ -55,15 +59,16 @@ namespace CollegeApp.Controllers
                 _logger.LogError("Student not found");
                 return NotFound("The request with given id is not found");
             }
-            var studentDTO = new StudentDTO
-            {
-                Id = student.Id,
-                Email = student.Email,
-                Address = student.Address,
-                StudentName = student.StudentName
-            };
+            var studentDTO = _mapper.Map<StudentDTO>(student);
+            //var studentDTO = new StudentDTO
+            //{
+            //    Id = student.Id,
+            //    Email = student.Email,
+            //    Address = student.Address,
+            //    StudentName = student.StudentName
+            //};
           
-            return Ok(student);
+            return Ok(studentDTO);
         }
 
         [HttpGet("{name:alpha}")]
@@ -76,9 +81,10 @@ namespace CollegeApp.Controllers
             if(string.IsNullOrEmpty(name))
                 return BadRequest();
             var student = await _dbContext.students.Where(n => n.StudentName == name).FirstOrDefaultAsync();
+            var studentDTO = _mapper.Map<StudentDTO>(student);
             if (student == null)
                 return NotFound();
-            return Ok(student);
+            return Ok(studentDTO);
         }
 
         [HttpDelete("{id:int}")]
@@ -116,13 +122,14 @@ namespace CollegeApp.Controllers
             //    return BadRequest(ModelState);
             //}
 
-            Student student = new Student
-            {
-              
-                StudentName=model.StudentName,
-                Email=model.Email,
-                Address=model.Address,
-            };
+            //Student student = new Student
+            //{
+
+            //    StudentName=model.StudentName,
+            //    Email=model.Email,
+            //    Address=model.Address,
+            //};
+            var student = _mapper.Map<Student>(model);
             await _dbContext.students.AddAsync(student);
             _dbContext.SaveChangesAsync();
             model.Id = student.Id;
@@ -140,22 +147,26 @@ namespace CollegeApp.Controllers
         {
             if (model == null||id<=0)
                 return BadRequest();
-            var estudent = await _dbContext.students.Where(n => n.Id == id).FirstOrDefaultAsync();
+            var estudent = await _dbContext.students.AsNoTracking().Where(n => n.Id == id).FirstOrDefaultAsync();
             if (estudent == null)
                 return NotFound();
-            var studentDTO = new StudentDTO
-            {
-                Id = estudent.Id,
-                StudentName = estudent.StudentName,
-                Email = estudent.Email,
-                Address = estudent.Address
-            };
+            //var studentDTO = new StudentDTO
+            //{
+            //    Id = estudent.Id,
+            //    StudentName = estudent.StudentName,
+            //    Email = estudent.Email,
+            //    Address = estudent.Address
+            //};
+
+            var studentDTO = _mapper.Map<StudentDTO>(estudent);
             model.ApplyTo(studentDTO, ModelState);
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
-            estudent.StudentName = studentDTO.StudentName;
-            estudent.Email = studentDTO.Email;
-            estudent.Address = studentDTO.Address;
+            //estudent.StudentName = studentDTO.StudentName;
+            //estudent.Email = studentDTO.Email;
+            //estudent.Address = studentDTO.Address;
+            estudent = _mapper.Map<Student>(studentDTO);
+            _dbContext.students.Update(estudent);
             _dbContext.SaveChangesAsync();
             return NoContent();
         }
@@ -167,12 +178,14 @@ namespace CollegeApp.Controllers
         {
             var student = await _dbContext.students.AsNoTracking().Where(n => n.Id == model.Id).FirstOrDefaultAsync();
 
-            var newRecord = new Student(){
-               Id=student.Id,
-               Email=model.Email,
-               Address=model.Address,
-               StudentName=model.StudentName
-            };
+            //var newRecord = new Student(){
+            //   Id=student.Id,
+            //   Email=model.Email,
+            //   Address=model.Address,
+            //   StudentName=model.StudentName
+            //};
+
+            var newRecord = _mapper.Map<Student>(model);
 
             _dbContext.students.Update(newRecord);
 
