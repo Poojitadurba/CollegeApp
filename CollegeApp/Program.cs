@@ -19,11 +19,11 @@ builder.Logging.AddLog4Net(); //use log4net with inbuilt loggers
 
 // Add services to the container.
 
-builder.Services.AddControllers();
+//builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
-builder.Services.AddControllers().AddNewtonsoftJson(); //HttpPatch
-builder.Services.AddControllers(options=>options.ReturnHttpNotAcceptable=true).AddNewtonsoftJson().AddXmlDataContractSerializerFormatters(); //Content negotiation
+//builder.Services.AddControllers().AddNewtonsoftJson(); //HttpPatch
+builder.Services.AddControllers(options=>options.ReturnHttpNotAcceptable=false).AddNewtonsoftJson().AddXmlDataContractSerializerFormatters(); //Content negotiation
 builder.Services.AddScoped<IMyLogger, LogToFile>();
 builder.Services.AddDbContext<CollegeDbContext>(options =>
 {
