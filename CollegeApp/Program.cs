@@ -28,6 +28,7 @@ builder.Services.AddOpenApi();
 builder.Services.AddControllers(options=>options.ReturnHttpNotAcceptable=false).AddNewtonsoftJson().AddXmlDataContractSerializerFormatters(); //Content negotiation
 builder.Services.AddScoped<IMyLogger, LogToFile>();
 builder.Services.AddScoped<IStudentRepository, StudentRepository>();
+builder.Services.AddScoped(typeof(ICollegeRepository<>), typeof(CollegeRepository<>));
 builder.Services.AddDbContext<CollegeDbContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("CollegeAppDBConnection"));
