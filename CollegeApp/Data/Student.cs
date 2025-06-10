@@ -13,5 +13,9 @@ namespace CollegeApp.Data
         public string Email { get; set; }
 
         public string Address { get; set; }
+
+        public int? DepartmentId { get; set; }
+
+        public virtual Department? Department { get; set; }
     }
 }

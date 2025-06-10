@@ -10,6 +10,7 @@ namespace CollegeApp.Data
             
         }
         public DbSet<Student> students { get; set; }
+        public DbSet<Department> departments { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -27,6 +28,7 @@ namespace CollegeApp.Data
             //    entity.Property(n => n.Email).IsRequired().HasMaxLength(250);
             //});
             modelBuilder.ApplyConfiguration(new StudentConfig());
+            modelBuilder.ApplyConfiguration(new DepartmentConfig());
         }
     }
 }

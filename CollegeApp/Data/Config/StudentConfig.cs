@@ -14,11 +14,16 @@ namespace CollegeApp.Data.Config
             builder.Property(n => n.StudentName).HasMaxLength(250);
             builder.Property(n => n.Address).IsRequired(false).HasMaxLength(500);
             builder.Property(n => n.Email).IsRequired().HasMaxLength(250);
+            // builder.Property(n => n.DepartmentId).IsRequired();
             builder.HasData(new List<Student>()
             {
                 new Student{Id=1,StudentName="Poojita",Address="Hyderabad",Email="abc@gmail.com"},
                 new Student{Id=2,StudentName="Keerthi Kalyan",Address="Coimbatore",Email="xyz@gmail.com"}
             });
+            builder.HasOne(n => n.Department).WithMany(n => n.Students).
+                HasForeignKey(n => n.DepartmentId)
+                .HasConstraintName("FK_Students_Department");
         }
+
     }
 }
