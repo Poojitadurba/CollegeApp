@@ -6,11 +6,13 @@ using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 using AutoMapper;
 using CollegeApp.Data.Repository;
+using Microsoft.AspNetCore.Cors;
 
 namespace CollegeApp.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+ //   [EnableCors(PolicyName ="AllowAll")]
     public class StudentController:ControllerBase
     {
         private readonly ILogger<StudentController> _logger;
@@ -52,6 +54,7 @@ namespace CollegeApp.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+      //  [DisableCors]
         public async Task<ActionResult<StudentDTO>> GetStudentById(int id)
         {
             _logger.LogInformation("GetStudentById started");

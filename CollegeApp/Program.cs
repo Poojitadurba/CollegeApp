@@ -34,6 +34,34 @@ builder.Services.AddDbContext<CollegeDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("CollegeAppDBConnection"));
 });
 builder.Services.AddAutoMapper(typeof(AutoMapperConfig));
+//builder.Services.AddCors(options => options.AddPolicy("MyTestCORS", policy =>
+//{
+//    //allow all origins
+//    policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
+//    //specific origin
+//    policy.WithOrigins("http://localhost:4248").AllowAnyOrigin().AllowAnyMethod();
+//}));
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
+    {
+        policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
+
+    });
+    options.AddPolicy("AllowAll", policy =>
+{
+    policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
+
+});
+    options.AddPolicy("AllowOnlylocalhost", policy =>
+    {
+        policy.WithOrigins("http://localhost:4200").AllowAnyHeader().AllowAnyMethod();
+    });
+    options.AddPolicy("AllowOnlyGoogle", policy =>
+    {
+        policy.WithOrigins("http://google.com","http://gmail.com","http://drive.google.com").AllowAnyHeader().AllowAnyMethod();
+    });
+});
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -44,7 +72,24 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+//app.UseCors("MyTestCORS");
+
+app.UseRouting();
+
+app.UseCors("AllowAll");
+
 app.UseAuthorization();
+
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapGet("api/testingendpoint",
+        context => context.Response.WriteAsync("Test Response")).RequireCors("AllowOnlyLocalhost");
+
+    endpoints.MapControllers().RequireCors("AllowAll");
+
+    endpoints.MapGet("api/testingendpoint2", context => context.Response.WriteAsync("Test Response2"));
+
+});
 
 app.MapControllers();
 
