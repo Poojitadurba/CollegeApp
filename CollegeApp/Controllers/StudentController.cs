@@ -7,12 +7,15 @@ using System.Threading.Tasks;
 using AutoMapper;
 using CollegeApp.Data.Repository;
 using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Authorization;
 
 namespace CollegeApp.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
- //   [EnableCors(PolicyName ="AllowAll")]
+    //[Authorize(AuthenticationSchemes="LoginForLocalUsers",Roles ="SuperAdmin,Admin")]
+    [Authorize(Roles = "SuperAdmin,Admin")]
+    //   [EnableCors(PolicyName ="AllowAll")]
     public class StudentController:ControllerBase
     {
         private readonly ILogger<StudentController> _logger;
@@ -32,6 +35,9 @@ namespace CollegeApp.Controllers
 
         [HttpGet]
         [Route("all")]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        // [AllowAnonymous]
         public async Task<ActionResult<IEnumerable<StudentDTO>>> GetAllStudents()
         {
             _logger.LogInformation("GetStudents started");
@@ -54,7 +60,9 @@ namespace CollegeApp.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-      //  [DisableCors]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        //  [DisableCors]
         public async Task<ActionResult<StudentDTO>> GetStudentById(int id)
         {
             _logger.LogInformation("GetStudentById started");
@@ -87,6 +95,8 @@ namespace CollegeApp.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<ActionResult<Student>> GetStudentByName(string name)
         {
             if(string.IsNullOrEmpty(name))
@@ -105,6 +115,8 @@ namespace CollegeApp.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<ActionResult<bool>> DeleteStudent(int id)
         {
             if (id < 0)
@@ -124,6 +136,8 @@ namespace CollegeApp.Controllers
         [Route("Create")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<ActionResult<StudentDTO>> CreateStudent([FromBody] StudentDTO model)
         {
             if (!ModelState.IsValid)
@@ -160,6 +174,8 @@ namespace CollegeApp.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<ActionResult<StudentDTO>> UpdateStudent(int id,[FromBody] JsonPatchDocument<StudentDTO> model)
         {
             if (model == null||id<=0)
@@ -191,6 +207,8 @@ namespace CollegeApp.Controllers
 
         [HttpPut]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<ActionResult> UpdateStudent([FromBody] StudentDTO model)
         {
             //var student = await _dbContext.students.AsNoTracking().Where(n => n.Id == model.Id).FirstOrDefaultAsync();
