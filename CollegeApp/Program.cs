@@ -77,6 +77,9 @@ builder.Services.AddCors(options =>
 });
 
 
+//string LocalAudience = builder.Configuration.GetValue<string>("LocalAudience");
+//string LocalIssuer = builder.Configuration.GetValue<string>("LocalIssuer");
+
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -90,7 +93,9 @@ builder.Services.AddAuthentication(options =>
         ValidateIssuerSigningKey = true,
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(builder.Configuration.GetValue<string>("JWTSecret"))),
         ValidateIssuer = false,
+        //ValidIssuer = LocalIssuer,
         ValidateAudience = false,
+        //ValidAudience=LocalAudience
     };
 });
 
@@ -142,6 +147,8 @@ app.UseRouting();
 
 app.UseAuthentication();
 
+app.UseCors("AllowAll");
+
 app.UseAuthorization();
 
 app.UseSwagger();
@@ -152,7 +159,6 @@ app.UseSwaggerUI(options =>
     options.SwaggerEndpoint("/swagger/v1/swagger.json", "CollegeApp API V1");
 });
 
-app.UseCors("AllowAll");
 
 app.UseEndpoints(endpoints =>
 {

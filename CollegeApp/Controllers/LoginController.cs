@@ -32,9 +32,13 @@ namespace CollegeApp.Controllers
             if(model.Username=="Poojita"&&model.Password=="Poojita123")
             {
                 var key = Encoding.ASCII.GetBytes(_configuration.GetValue<string>("JWTSecret"));
+                //var issuer = _configuration.GetValue<string>("LocalIssuer");
+                //var audience = _configuration.GetValue<string>("LocalAudience");
                 var tokenHandler = new JwtSecurityTokenHandler();
                 var tokenDescriptor = new SecurityTokenDescriptor()
                 {
+                  //  Issuer=issuer,
+                    //Audience=audience,
                     Subject = new ClaimsIdentity(new Claim[]
                     {
                         new Claim(ClaimTypes.Name,model.Username),
